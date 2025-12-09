@@ -38,14 +38,14 @@ MPDistil consists of 4 training phases:
 ### From GitHub (Recommended)
 
 ```bash
-pip install git+https://github.com/yashpatel2010/mpdistil_02.git
+pip install git+https://github.com/parmanu-lcs2/mpdistil.git
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/yashpatel2010/mpdistil_02.git
-cd mpdistil_02
+git clone https://github.com/parmanu-lcs2/mpdistil.git
+cd mpdistil
 pip install -e .
 ```
 
