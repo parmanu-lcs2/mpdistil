@@ -230,13 +230,9 @@ Performance on SuperGLUE tasks (BERT-base teacher → BERT-6L student):
 
 ## 📝 Examples
 
-See the `examples/` directory for Jupyter notebooks:
+See the `demo/` directory for Jupyter notebooks:
 
-- **[01_quickstart.ipynb](examples/01_quickstart.ipynb)**: Basic usage with SuperGLUE
-- **[02_custom_data.ipynb](examples/02_custom_data.ipynb)**: Using custom datasets
-- **[03_advanced_config.ipynb](examples/03_advanced_config.ipynb)**: Advanced configurations
-- **[04_metric_configuration.ipynb](examples/04_metric_configuration.ipynb)**: Metric selection and evaluation
-- **[05_meta_loaders.ipynb](examples/05_meta_loaders.ipynb)**: Multi-task curriculum learning
+- **[GLUE.ipynb](demo/GLUE.ipynb)**: Usage with SuperGLUE
 
 ## 📊 Evaluation Metrics
 
@@ -270,125 +266,6 @@ model = MPDistil(task_name='STS-B', num_labels=1, metric='correlation', is_regre
 # Auto-detect
 model = MPDistil(task_name='CB', num_labels=3, metric='auto')  # Uses F1 for CB
 ```
-
-## 💡 Featured Examples
-
-### Example 1: Multi-Task Curriculum Learning with `meta_epochs`
-
-Complete example from **[05_meta_loaders.ipynb](examples/05_meta_loaders.ipynb)** showing multi-task training:
-
-```python
-from mpdistil import MPDistil, load_superglue_dataset
-
-# Load main task
-loaders_cb, num_labels_cb = load_superglue_dataset('CB', max_samples=100)
-
-# Load auxiliary tasks for curriculum learning
-loaders_rte, _ = load_superglue_dataset('RTE', max_samples=100)
-loaders_boolq, _ = load_superglue_dataset('BoolQ', max_samples=100)
-
-# Create meta_loaders dictionary - simple API!
-meta_loaders = {
-    'RTE': loaders_rte['val'],      # Use validation data for auxiliary tasks
-    'BoolQ': loaders_boolq['val']
-}
-
-# Initialize model
-model = MPDistil(
-    task_name='CB',
-    num_labels=num_labels_cb,
-    metric='f1',
-    student_layers=6
-)
-
-# Train with all 4 phases + curriculum learning
-history = model.train(
-    train_loader=loaders_cb['train'],
-    val_loader=loaders_cb['val'],
-    meta_loaders=meta_loaders,      # Enable Phase 4 curriculum learning
-    teacher_epochs=2,                # Phase 1
-    student_epochs=2,                # Phase 2
-    meta_epochs=3,                   # Phase 3 - NEW! Train meta-teacher for 3 epochs
-    num_episodes=20                  # Phase 4 - RL-based task selection
-)
-
-# Analyze curriculum learning results
-if 'phase4' in history:
-    trajectories = history['phase4']['trajectories']
-    rewards = history['phase4']['rewards']
-    
-    print(f"Curriculum selected tasks adaptively across {len(trajectories)} episodes")
-    print(f"Average reward: {sum(rewards)/len(rewards):.4f}")
-```
-
-**Key Features Demonstrated:**
-- ✅ Simple `meta_loaders` API - just dict of task→DataLoader
-- ✅ `meta_epochs=3` - Phase 3 now trains for multiple epochs
-- ✅ `metric='f1'` - Using F1 score for imbalanced CB task
-- ✅ Full 4-phase training with curriculum learning
-
-### Example 2: Metric Configuration for Different Tasks
-
-Complete example from **[04_metric_configuration.ipynb](examples/04_metric_configuration.ipynb)** showing metric selection:
-
-```python
-from mpdistil import MPDistil, load_superglue_dataset
-
-# Example 1: Binary classification with MCC
-print("Training RTE with Matthews Correlation Coefficient...")
-loaders_rte, num_labels_rte = load_superglue_dataset('RTE', max_samples=100)
-
-model_mcc = MPDistil(
-    task_name='RTE',
-    num_labels=num_labels_rte,
-    metric='mcc',           # Perfect for binary classification
-    student_layers=6
-)
-
-history_mcc = model.train(
-    train_loader=loaders_rte['train'],
-    val_loader=loaders_rte['val'],
-    teacher_epochs=2,
-    student_epochs=2,
-    meta_epochs=1,
-    num_episodes=10
-)
-
-# View MCC results
-metrics = history_mcc['phase2']['val_metrics'][-1]
-print(f"Final MCC: {metrics['mcc']:.4f}")
-
-# Example 2: Multi-class with F1
-print("\nTraining CB with F1 score...")
-loaders_cb, num_labels_cb = load_superglue_dataset('CB', max_samples=100)
-
-model_f1 = MPDistil(
-    task_name='CB',
-    num_labels=num_labels_cb,
-    metric='f1',            # Gets accuracy + F1 + avg
-    student_layers=6
-)
-
-history_f1 = model_f1.train(
-    train_loader=loaders_cb['train'],
-    val_loader=loaders_cb['val'],
-    teacher_epochs=2,
-    student_epochs=2,
-    meta_epochs=1
-)
-
-# View comprehensive metrics
-metrics = history_f1['phase2']['val_metrics'][-1]
-print(f"Accuracy: {metrics['acc']:.4f}")
-print(f"F1 Score: {metrics['f1']:.4f}")
-print(f"Avg (Acc+F1): {metrics['acc_and_f1']:.4f}")
-```
-
-**Key Features Demonstrated:**
-- ✅ `metric='mcc'` - Matthews Correlation for binary tasks
-- ✅ `metric='f1'` - F1 score returns multiple metrics
-- ✅ `meta_epochs=1` - Configurable Phase 3 epochs
-- ✅ Task-specific metric selection for optimal evaluation
 
 ## 🔬 How It Works
 
