@@ -230,9 +230,9 @@ Performance on SuperGLUE tasks (BERT-base teacher → BERT-6L student):
 
 ## 📝 Examples
 
-See the `demo/` directory for Jupyter notebooks:
+See the `examples/` directory for Jupyter notebooks:
 
-- **[GLUE.ipynb](demo/GLUE.ipynb)**: Usage with SuperGLUE
+- **[GLUE.ipynb](examples/GLUE.ipynb)**: Usage with SuperGLUE
 
 ## 📊 Evaluation Metrics
 
