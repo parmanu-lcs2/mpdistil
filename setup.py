@@ -13,12 +13,12 @@ with open(os.path.join("mpdistil", "__version__.py")) as fp:
 setup(
     name="mpdistil",
     version=version['__version__'],
-    author="Paramu, LCS2, IIT Delhi",
+    author="Parmanu, LCS2, IIT Delhi",
     author_email="",
     description="Meta-Policy Knowledge Distillation for compact student models",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/joshipratik232/mpdistil",
+    url="https://github.com/parmanu-lcs2/mpdistil/",
     packages=find_packages(exclude=["examples", "tests"]),
     classifiers=[
         "Development Status :: 3 - Alpha",
