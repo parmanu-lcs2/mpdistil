@@ -49,6 +49,12 @@ cd mpdistil
 pip install -e .
 ```
 
+### From pypi
+
+```bash
+pip install mpdistil
+```
+
 ## 💡 Quick Start
 
 ### Basic Usage
